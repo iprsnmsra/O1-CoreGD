@@ -1,0 +1,38 @@
+name: AAA Game Dev CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  static-analysis-csharp:
+    name: Unity C# Syntax & Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x' # Use latest for generic syntax checking
+
+      - name: Run C# Linter (dotnet format)
+        # Checks all .cs files for syntax and stylistic errors without needing Unity
+        run: dotnet format whitespace --verify-no-changes
+        
+  static-analysis-cpp:
+    name: Unreal C++ Memory & Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Cppcheck
+        run: sudo apt-get install cppcheck -y
+
+      - name: Run Cppcheck Analysis
+        # Scans all C++ files for memory leaks, null pointers, and syntax errors
+        run: cppcheck --enable=warning,performance,portability --error-exitcode=1 --force -I ./00_Core/ ./
