@@ -1,0 +1,3 @@
+# Unreal Engine generated files
+*.generated.h
+*.generated.cpp
