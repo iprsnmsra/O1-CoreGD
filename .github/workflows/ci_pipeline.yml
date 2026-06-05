@@ -1,4 +1,4 @@
-name: AAA Game Dev CI Pipeline
+name: O1-CoreGD Framework CI
 
 on:
   push:
@@ -7,34 +7,27 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  static-analysis-csharp:
-    name: Unity C# Integrity Check
+  validate-architecture:
+    name: Framework Check (${{ matrix.language }})
     runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false 
+      matrix:
+        language: [ 'csharp', 'cpp' ]
+
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Verify C# Script Integrity
-        # Bypasses the need for a Unity .csproj file.
-        # Checks for unresolved merge conflicts and file corruption.
+      - name: Setup Engine Tools (C++)
+        if: matrix.language == 'cpp'
         run: |
-          echo "Scanning C# files for structural integrity..."
-          if grep -rnw . --include="*.cs" -e "<<<<<<< HEAD"; then
-            echo "::error::Unresolved Git merge conflicts found in C# files!"
-            exit 1
-          fi
-          echo "Success: No merge conflicts. C# files are structurally sound."
-        
-  static-analysis-cpp:
-    name: Unreal C++ Memory Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
 
-      - name: Install Cppcheck
-        run: sudo apt-get install cppcheck -y
-
-      - name: Run Cppcheck Analysis
-        # Added suppressions for missing Unreal Engine core files
-        run: cppcheck --enable=warning,performance --error-exitcode=1 --force --suppress=missingIncludeSystem --suppress=missingInclude --suppressions-list=.cppcheck-suppressions.txt ./
+      - name: Execute Core Validation
+        run: |
+          echo "Executing AAA framework tests for ${{ matrix.language }}..."
+          chmod +x ./run_tests.sh
+          ./run_tests.sh ${{ matrix.language }}
