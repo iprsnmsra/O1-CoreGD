@@ -17,8 +17,8 @@ echo [SUCCESS] C# Scripts are clean.
 
 echo.
 echo [2/2] Checking Unreal C++ Scripts...
-REM Requires cppcheck to be installed on Windows and added to PATH
-cppcheck --enable=warning,performance,portability --error-exitcode=1 --force .
+REM Requires cppcheck installed and Unreal suppressions file present
+cppcheck --enable=warning,performance,portability --error-exitcode=1 --force --suppressions-list=.cppcheck-suppressions.txt .
 if %ERRORLEVEL% neq 0 (
     color 0C
     echo [ERROR] C++ Memory or Syntax check failed!

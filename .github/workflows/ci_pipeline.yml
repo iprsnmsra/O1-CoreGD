@@ -17,10 +17,9 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x' # Use latest for generic syntax checking
+          dotnet-version: '8.0.x' 
 
       - name: Run C# Linter (dotnet format)
-        # Checks all .cs files for syntax and stylistic errors without needing Unity
         run: dotnet format whitespace --verify-no-changes
         
   static-analysis-cpp:
@@ -34,5 +33,5 @@ jobs:
         run: sudo apt-get install cppcheck -y
 
       - name: Run Cppcheck Analysis
-        # Scans all C++ files for memory leaks, null pointers, and syntax errors
-        run: cppcheck --enable=warning,performance,portability --error-exitcode=1 --force -I ./00_Core/ ./
+        # Scans C++ files with Unreal macros suppressed
+        run: cppcheck --enable=warning,performance,portability --error-exitcode=1 --force -I ./00_Core/ --suppressions-list=.cppcheck-suppressions.txt ./
