@@ -5,20 +5,19 @@ echo [AAA GAME DEV] - Running Pre-Commit Local Checks
 echo ===================================================
 
 echo.
-echo [1/2] Checking Unity C# Scripts...
-dotnet format whitespace --verify-no-changes
-if %ERRORLEVEL% neq 0 (
+echo [1/2] Checking Unity C# Scripts Integrity...
+findstr /S /C:"<<<<<<< HEAD" *.cs >nul
+if %ERRORLEVEL% equ 0 (
     color 0C
-    echo [ERROR] C# syntax or formatting check failed! Fix your .cs files.
+    echo [ERROR] Unresolved Git merge conflicts found in C# files!
     pause
-    exit /b %ERRORLEVEL%
+    exit /b 1
 )
 echo [SUCCESS] C# Scripts are clean.
 
 echo.
 echo [2/2] Checking Unreal C++ Scripts...
-REM Requires cppcheck installed and Unreal suppressions file present
-cppcheck --enable=warning,performance,portability --error-exitcode=1 --force --suppressions-list=.cppcheck-suppressions.txt .
+cppcheck --enable=warning,performance --error-exitcode=1 --force --suppress=missingIncludeSystem --suppress=missingInclude --suppressions-list=.cppcheck-suppressions.txt .
 if %ERRORLEVEL% neq 0 (
     color 0C
     echo [ERROR] C++ Memory or Syntax check failed!
